@@ -17,6 +17,8 @@ func HanlerServer(port string) {
 
 	fmt.Println("Server is listening on port", port)
 
+	go Broadcast() // Start lesining to messages
+
 	for {
 		conn, err := server.Accept() // Waits for a new clients
 		if err != nil {
@@ -24,6 +26,21 @@ func HanlerServer(port string) {
 			continue
 		}
 
-		go HandleClient(conn) // To make the server can handle multiple client at the same time
+		go HandleClient(conn) // Start a new goroutine for this client
+	}
+}
+
+func Broadcast() {
+
+	for msg := range chanMessage { // A loop that waits for new messages on the channel
+		// Save message to history
+		serverLogHistory = append(serverLogHistory, msg)
+
+		// Send to all clients
+		clientsMutex.Lock()
+		for _, client := range clients {
+			fmt.Fprintln(client.Conn, msg)
+		}
+		clientsMutex.Unlock()
 	}
 }

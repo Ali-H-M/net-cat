@@ -7,10 +7,12 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run main.go <port>")
+	if len(os.Args) > 2 {
+		fmt.Println("[USAGE]: go run main.go $port")
 		return
+	} else if len(os.Args) == 2 {
+		funcs.DEFULT_PORT = os.Args[1]
 	}
 
-	funcs.HanlerServer(os.Args[1])
+	funcs.HanlerServer(funcs.DEFULT_PORT)
 }
